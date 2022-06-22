@@ -304,8 +304,8 @@ int zfctab_echo1[MAX_SLICE3D];
       cvoverride(opmph,PSD_ON,PSD_FIX_ON,PSD_EXIST_ON);
     }
     /*set default name brsfc to enable multiEcho option, JL 04072021*/
-    /*if (NULL != strstr(PSD_NAME, "brsfc")) {*/
-    if (NULL != strstr(PSD_NAME, "brsme")) {
+    if (NULL != strstr(PSD_NAME, "brsfc")) {
+    /*if (NULL != strstr(PSD_NAME, "brsme")) {*/
       brs_me_flag = 1;
     } else {
       brs_me_flag = 0;
