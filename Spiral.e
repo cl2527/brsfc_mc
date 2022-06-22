@@ -2763,16 +2763,11 @@ STATUS spiral_scancore_phase(int phaseindex)
       for(dabecho=0; dabecho<flex_necho; dabecho++) {
 
         /*Add seqwait2 to plot waveform, JHL 06/28/2021*/
-        if (time_wait2 > 0)
-        {
-          boffset(off_seqwait2);
-          setperiod(time_wait2, &seqwait2, 0);
-          startseq((short)0, (SHORT)MAY_PAUSE);
-        }
 
+        /*
         if (0==Tr) 
           boffset(off_seqcore);
-        else 
+        else */
           boffset(off_seqcore2);
         
         if (!brs_realtime)    /* BMK 2006.07.26 */
