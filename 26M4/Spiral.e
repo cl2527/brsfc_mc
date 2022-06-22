@@ -215,8 +215,7 @@ int time_wait4 = 0;
 
 /*Add flag for center kz fulll sample, JHL 06/29/2021*/
 /*int center_full_flag = 0 with {0,1,0,VIS,"center kz full sample in each segment",};*/
-/*Remove center kz sample flag, keep either full kz sample or partial fourier kz encodes, JHL 04/01/2022*/
-/*int centerkz = 0 with {0,,0,VIS,"number of full sample center kz in each segment",};*/
+int centerkz = 0 with {0,,0,VIS,"number of full sample center kz in each segment",};
 int brs_zseg = 1 with {0,,1,VIS,"number of kz segments",};
 int brs_zvps = 1 with {0,,1,VIS,"number of views per kz segments (without center kz views)",};
 
@@ -793,14 +792,13 @@ if (BRS)
       cvmod(opuser24, 0, 20, 6, "Number of segments", 0, "");
       piuset |= use24;
       brs_zseg = exist(opuser24);
-      /* Remove center kz flag, change back to fracz related flag for either fully kz sample or partial fourier kz encodes, JHL 04/01/2022*/
-      /*if (brs_vieword == 14)
+      if (brs_vieword == 14)
       {
         cvmod(opuser17, 0, 20, 0, "center kz full sample", 0, "");
         opuser17 = _opuser17.defval;
         piuset |= use17;
         centerkz = exist(opuser17);
-      }*/
+      }
     }
 
 
@@ -1265,7 +1263,7 @@ STATUS set_spiral_spoilers (void) {
                            &pw_gyspoila,
                            &pw_gyspoil,
                            &pw_gyspoild);
-  /*
+                           /*
   if (PM_ADDECHO == brs_pm_type) {
     set_spiral_spoilers_aux (brs_xarea2, 
                              brs_yarea2,
@@ -1605,8 +1603,11 @@ if (BRS)
                    brs_dofracz,
                    brs_fracz_fact,
                    1 /*brs_debug_vieword*/,
+                   centerkz,
                    &brs_fs_slice,
                    brs_jumptab,
+                   &brs_zseg,
+                   &brs_zvps,
                    brs_viewtab);
 
     /*rhrecon = 69;*/       /* BOXU 2009.10.07 */
@@ -2702,9 +2703,8 @@ STATUS spiral_scancore_phase(int phaseindex)
     /*ADD brs_vieword == 14 for cardiac QSM, JHL 06/28/2021*/
     if (brs_vieword == 2 || brs_vieword == 4 || brs_vieword == 14){	    
 	    numacqs = brs_nphases * brs_numleaves_acq * pfkz_total;
-      /*remove centerkz flag, JHL 04/01/2022*/
-      /*if (centerkz)
-        numacqs += brs_nphases * brs_numleaves_acq * centerkz * (brs_zseg - 1); */ 
+      if (centerkz)
+        numacqs += brs_nphases * brs_numleaves_acq * centerkz * (brs_zseg - 1);
       if (PM_ADDECHO == brs_pm_type)
         numacqs += brs_pm_numleaves * pfkz_total;
     } else {
@@ -2948,7 +2948,8 @@ STATUS spiral_scancore_phase(int phaseindex)
 
 
     return SUCCESS;
-}
+} /* end spiral_scancore_phase */
+
 
 int brs_getviews(int *view, int *tphase, int *slice, int *acqcount, 
                  int trigstate, int nacqs, int *te, int *tr)

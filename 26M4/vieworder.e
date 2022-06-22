@@ -9,8 +9,11 @@ void brs_genviewtab(int nleaves,
                     int dofracz,
                     int fracz_fact,
                     int debug,
+                    int centerkz,
                     int * fs_slice,
                     int * jumptab,
+                    int * rzseg,
+                    int * rzvps,
                     SPIRAL_VIEW *vt)
 {
    int i, j, k;
@@ -26,12 +29,14 @@ void brs_genviewtab(int nleaves,
    /*centerkz = (pfkz_total%2) ? 4 : 3;*/
    zseg = pfkz_segments;
    zvps = pfkz_views_per_segment;
-   /*if (centerkz){
-        zvps = ((zvps+centerkz) < 15) ? zvps : 15-centerkz;*/   /* to ensure the self-gating signal sampling time less than 300ms*/
-        /*zseg = (pfkz_total-centerkz)/zvps;
+   if (centerkz){
+        zvps = ((zvps+centerkz) < 15) ? zvps : 15-centerkz;   /* to ensure the self-gating signal sampling time less than 300ms*/
+        zseg = (pfkz_total-centerkz)/zvps;
         acqslquant = pfkz_total+centerkz*(zseg-1);
-   }*/
+   }
    /******** to return the value back to Spiral.e, JHL 06/29/2021 ********/
+   *rzseg = zseg;
+   *rzvps = zvps;
 
    switch (vieword)
    {
@@ -188,39 +193,63 @@ void brs_genviewtab(int nleaves,
 
 /************************************************/
 
-/**************************Add Cardiac QSM view order with segmented kz acquisition, JHL 06/28/2021****************************/
+    /**************************Add Cardiac QSM view order with segmented kz acquisition, JHL 06/28/2021****************************/
         case BRS_CARDIAC_QSM:
         {
-            /* modified to remove centerkz, segmented kz with or without partial fourier kz encodes*/
-			/* segmented full kz encodes */
-            int last_slice, slice_tot;
-            if (!pfkz_flag)
-                slice_tot = slquant;
-            else
-                slice_tot = pfkz_total;
-            last_slice = slice_tot - 1;
-            for (i=0; i<nphases; i++){
-                for (j=0; j<nleaves; j++){
-                    k = 0;
-                    for (segment_cnt=0; segment_cnt<zseg; segment_cnt++){
-                        for (slice_cnt=0; slice_cnt<zvps; slice_cnt++){
-                            t = (last_slice-segment_cnt)-zseg*slice_cnt;
-                            vt[i*nleaves*slice_tot+j*slice_tot+k].phase = i;
-                            vt[i*nleaves*slice_tot+j*slice_tot+k].slice = t;
-                            if (golden_ratio_flag)
-                                vt[i*nleaves*slice_tot+j*slice_tot+k].leaf = j;
-                            else {
-                                modresult = j%nfolds;
-                                vt[i*nleaves*slice_tot+j*slice_tot+k].leaf = modresult*(nleaves/nfolds) + j/nfolds;
+            int last_slice = pfkz_total -1;
+			/* partial kz with segment */
+           if (!centerkz) {
+				for (i = 0; i < nphases; i++){
+					for (j = 0; j < nleaves; j++){
+						k = 0;
+						for (segment_cnt = 0; segment_cnt < zseg  ; segment_cnt++){
+							for (slice_cnt = 0 ; slice_cnt < zvps ; slice_cnt++ ){
+								t = (last_slice-segment_cnt) - zseg*slice_cnt;
+								vt[i*nleaves*pfkz_total + j*pfkz_total + k].phase = i;
+								vt[i*nleaves*pfkz_total + j*pfkz_total + k].slice = t;
+								modresult = j%nfolds;
+                                if (golden_ratio_flag)
+                                    vt[i*nleaves*pfkz_total + j*pfkz_total + k].leaf = j;
+                                else
+								    vt[i*nleaves*pfkz_total + j*pfkz_total + k].leaf = modresult*(nleaves/nfolds) + j/nfolds;
+								k = k+1;
+							}
+						}					   
+					}
+				}
+			} else {
+                /*center kz full sampled*/
+                for (i = 0; i < nphases; i++){
+                    for (j = 0; j < nleaves; j++){
+                        k = 0;
+                        for (segment_cnt = 0; segment_cnt < zseg; segment_cnt++){
+                            for (slice_cnt = 0; slice_cnt < zvps+centerkz; slice_cnt++){
+                                if (golden_ratio_flag) 
+                                    vt[i*nleaves*acqslquant + j*acqslquant + k].leaf = j;
+                                else {
+                                    modresult = j%nfolds;
+                                    vt[i*nleaves*acqslquant + j*acqslquant + k].leaf = modresult*(nleaves/nfolds) + j/nfolds;
+                                }
+                                vt[i*nleaves*acqslquant + j*acqslquant + k].phase = i;
+                                if (slice_cnt < centerkz){
+                                    t = pfkz_total/2-2+slice_cnt;
+                                }
+                                else if ((slice_cnt - centerkz) < zvps/2){
+                                    t = (pfkz_total/2-3-segment_cnt) - zseg*(slice_cnt-centerkz);
+                                }
+                                else {
+                                    t = (pfkz_total-1-segment_cnt) - zseg*(slice_cnt-centerkz-zvps/2);
+                                }
+                                vt[i*nleaves*acqslquant + j*acqslquant + k].slice = t;
+                                k += 1;
                             }
-                            k += 1;
-                        }
+                        }					   
                     }
                 }
             }
         }
             break;
-/*****************************************************************************************************************************/
+    /*****************************************************************************************************************************/
 
        case BRS_CINE:
        {
