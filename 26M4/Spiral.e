@@ -1265,6 +1265,7 @@ STATUS set_spiral_spoilers (void) {
                            &pw_gyspoila,
                            &pw_gyspoil,
                            &pw_gyspoild);
+  /*
   if (PM_ADDECHO == brs_pm_type) {
     set_spiral_spoilers_aux (brs_xarea2, 
                              brs_yarea2,
@@ -1276,7 +1277,7 @@ STATUS set_spiral_spoilers (void) {
                              &pw_gyspoil2a,
                              &pw_gyspoil2,
                              &pw_gyspoil2d);
-  }
+  }*/
   return SUCCESS;
 }
 

@@ -20633,6 +20633,7 @@ set_rdout_and_tmin( void )
                                pw_gxspoila+pw_gxspoil+pw_gxspoild,
                                pw_gyspoila+pw_gyspoil+pw_gyspoild,
                                pw_gzpa+pw_gzp+pw_gzpd-4us*brs_ramplength);
+        /*
         if (PM_ADDECHO == brs_pm_type) {
           brs_mapdel_act = brs_gradlen*GRAD_UPDATE_TIME + brs_ramplength 
                            + IMax(2, 
@@ -20649,9 +20650,9 @@ set_rdout_and_tmin( void )
                               + brs_ramplength2
                              );
           brs_mapdel_act = (brs_mapdel_act/GRAD_UPDATE_TIME)*GRAD_UPDATE_TIME;
-        } else {
+        } else { */
           brs_mapdel_act = brs_mapdel;
-        }
+        /*}*/
         
         if (brs_flex) {
           esp = brs_mapdel_act;

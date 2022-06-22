@@ -1034,8 +1034,9 @@ RF_PULSE rfpulse[MAX_RFPULSE] = {
       0,
       0.0 /* intabspwmcurr */
     /*************************************************************/
-    },
+    }
     /* GRADX 12 - X spoiler gradient for 2nd spiral, BMK 2007.06.26 */
+    /*
     {
       G_TRAP,
       (int *)&pw_gxspoil2a,
@@ -1058,9 +1059,8 @@ RF_PULSE rfpulse[MAX_RFPULSE] = {
       0.0,
       0,
       0,
-      0.0 /* intabspwmcurr */
-    /*************************************************************/
-    }
+      0.0 
+    }*/
   };
 
 
