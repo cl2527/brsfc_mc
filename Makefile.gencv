@@ -1,0 +1,258 @@
+GENCVSH=../../../util/gencv/gencv.sh
+ifndef ESEVER
+$(error Please define ESEVER)
+endif
+ifndef PSD
+PSD=brs
+endif
+ifndef EPIC_INCLUDES
+EPIC_INCLUDES=-I../../util/include/${ESEVER} -I../../util/include/${ESEVER}/ESE
+endif
+EPIC_INCLUDES+=-I. -D_INCLUDE_MYDEFINES
+
+STUFF_TO_CLEAN=$(PSD)_cv_reader.c $(PSD)_cv_printer.c $(PSD)_cv_reader.m \
+  $(PSD)_cv_sizeof.m print_$(PSD)_cv print_$(PSD)_cv.c log_grad_struct.h
+
+hw sim $(MAKE_TARGET)::
+	if [ $(ESEMAJOR) -ge 16 ];  then \
+		if [ -h log_grad_struct.h ]; then \
+			rm log_grad_struct.h; \
+		fi; \
+		if [ $(ESEMAJOR) -ge 24 ];  then \
+			ln -s /ESE_$(ESEVER)/psd/include/private/log_grad_struct.h . ; \
+		else \
+			ln -s /ESE_$(ESEVER)/psd/include/log_grad_struct.h . ; \
+		fi;\
+	fi
+	if [ $(ESEMAJOR) -ge 22 ];  then \
+		if [ -h CoilParameters.h ]; then \
+			rm CoilParameters.h; \
+		fi; \
+		ln -s /ESE_$(ESEVER)/lx/include/CoilParameters.h . ; \
+		if [ -h CoilDefs.h ]; then \
+			rm CoilDefs.h; \
+		fi; \
+		ln -s /ESE_$(ESEVER)/lx/include/CoilDefs.h . ; \
+		if [ -h coilIdDefs.h ]; then \
+			rm coilIdDefs.h; \
+		fi; \
+		ln -s /ESE_$(ESEVER)/lx/include/coilIdDefs.h . ; \
+	fi
+	if [ $(ESEMAJOR) -ge 26 ];  then \
+		if [ -h sysDepSupport.h ]; then \
+			rm sysDepSupport.h; \
+		fi; \
+		ln -s /ESE_${ESEVER}/psd/include/private/support/sysDepSupport.h .; \
+		if [ -h sysDep.h ]; then \
+			rm sysDep.h; \
+		fi; \
+		ln -s /ESE_${ESEVER}/psd/include/private/support/sysDep.h .; \
+		if [ -h check_apconfig.h ]; then \
+			rm check_apconfig.h; \
+		fi; \
+		ln -s /ESE_${ESEVER}/psd/include/private/support/check_apconfig.h .; \
+		if [ -h hwConfig.h ]; then \
+			rm hwConfig.h; \
+		fi; \
+		ln -s /ESE_${ESEVER}/psd/include/private/support/hwConfig.h .; \
+		if [ -h printDebug.h ]; then \
+			rm printDebug.h; \
+		fi; \
+		ln -s /ESE_${ESEVER}/psd/include/private/support/printDebug.h .; \
+		if [ -h log_trace_service_client.h ]; then \
+			rm log_trace_service_client.h; \
+		fi; \
+		ln -s /ESE_${ESEVER}/host/include/log_trace_service_client.h .; \
+		if [ -h log_trace_service_common.h ]; then \
+			rm log_trace_service_common.h; \
+		fi; \
+		ln -s /ESE_${ESEVER}/host/include/log_trace_service_common.h .; \
+		if [ -h appsUtility.h ]; then \
+			rm appsUtility.h; \
+		fi; \
+		ln -s /ESE_${ESEVER}/psd/include/private/support/appsUtility.h .; \
+		if [ -h B1Opt.h ]; then \
+			rm B1Opt.h; \
+		fi; \
+		ln -s /ESE_${ESEVER}/psd/include/private/support/B1Opt.h .; \
+		if [ -h computeSeqParam.h ]; then \
+			rm computeSeqParam.h; \
+		fi; \
+		ln -s /ESE_${ESEVER}/psd/include/private/support/computeSeqParam.h .; \
+		if [ -h crusher.h ]; then \
+			rm crusher.h; \
+		fi; \
+		ln -s /ESE_${ESEVER}/psd/include/private/support/crusher.h .; \
+		if [ -h dBdt.h ]; then \
+			rm dBdt.h; \
+		fi; \
+		ln -s /ESE_${ESEVER}/psd/include/private/support/dBdt.h .; \
+		if [ -h flowComp.h ]; then \
+			rm flowComp.h; \
+		fi; \
+		ln -s /ESE_${ESEVER}/psd/include/private/support/flowComp.h .; \
+		if [ -h freqEncoding.h ]; then \
+			rm freqEncoding.h; \
+		fi; \
+		ln -s /ESE_${ESEVER}/psd/include/private/support/freqEncoding.h .; \
+		if [ -h gradMaxwellTerms.h ]; then \
+			rm gradMaxwellTerms.h; \
+		fi; \
+		ln -s /ESE_${ESEVER}/psd/include/private/support/gradMaxwellTerms.h .; \
+		if [ -h gradMoments.h ]; then \
+			rm gradMoments.h; \
+		fi; \
+		ln -s /ESE_${ESEVER}/psd/include/private/support/gradMoments.h .; \
+		if [ -h gradProtection.h ]; then \
+			rm gradProtection.h; \
+		fi; \
+		ln -s /ESE_${ESEVER}/psd/include/private/support/gradProtection.h .; \
+		if [ -h gradUtility.h ]; then \
+			rm gradUtility.h; \
+		fi; \
+		ln -s /ESE_${ESEVER}/psd/include/private/support/gradUtility.h .; \
+		if [ -h limitSeqParam.h ]; then \
+			rm limitSeqParam.h; \
+		fi; \
+		ln -s /ESE_${ESEVER}/psd/include/private/support/limitSeqParam.h .; \
+		if [ -h mathUtility.h ]; then \
+			rm mathUtility.h; \
+		fi; \
+		ln -s /ESE_${ESEVER}/psd/include/private/support/mathUtility.h .; \
+		if [ -h phaseEncoding.h ]; then \
+			rm phaseEncoding.h; \
+		fi; \
+		ln -s /ESE_${ESEVER}/psd/include/private/support/phaseEncoding.h .; \
+		if [ -h filterUtil.h ]; then \
+			rm filterUtil.h; \
+		fi; \
+		ln -s /ESE_${ESEVER}/psd/include/private/support/filterUtil.h .; \
+		if [ -h RFAmpProtection.h ]; then \
+			rm RFAmpProtection.h; \
+		fi; \
+		ln -s /ESE_${ESEVER}/psd/include/private/support/RFAmpProtection.h .; \
+		if [ -h RFUtility.h ]; then \
+			rm RFUtility.h; \
+		fi; \
+		ln -s /ESE_${ESEVER}/psd/include/private/support/RFUtility.h .; \
+		if [ -h RFWaveGen.h ]; then \
+			rm RFWaveGen.h; \
+		fi; \
+		ln -s /ESE_${ESEVER}/psd/include/private/support/RFWaveGen.h .; \
+		if [ -h SARProtection.h ]; then \
+			rm SARProtection.h; \
+		fi; \
+		ln -s /ESE_${ESEVER}/psd/include/private/support/SARProtection.h .; \
+		if [ -h sliceEncoding.h ]; then \
+			rm sliceEncoding.h; \
+		fi; \
+		ln -s /ESE_${ESEVER}/psd/include/private/support/sliceEncoding.h .; \
+		if [ -h supportLogging.h ]; then \
+			rm supportLogging.h; \
+		fi; \
+		ln -s /ESE_${ESEVER}/psd/include/private/support/supportLogging.h .; \
+		if [ -h imageCutReduction.h ]; then \
+			rm imageCutReduction.h; \
+		fi; \
+		ln -s /ESE_${ESEVER}/psd/include/private/support/imageCutReduction.h .; \
+	fi
+	if [ $(ESEMAJOR) -ge 27 ];  then \
+		if [ -h XRMB_fftlibrary.h ]; then \
+			rm XRMB_fftlibrary.h; \
+		fi; \
+		ln -s /ESE_${ESEVER}/psd/include/private/support/XRMB_fftlibrary.h .; \
+	fi
+	if [ $(ESEMAJOR) -ge 24 ];  then                                \
+		if [ -h epic_geometry_types.h ]; then                         \
+			rm epic_geometry_types.h;                                   \
+		fi;                                                           \
+		ln -s /ESE_$(ESEVER)/psd/include/epic_geometry_types.h . ;    \
+		echo "/* " > $(PSD).allcvs.c;                                 \
+		echo " * Generated by Makefile.gencv on `date`" >> $(PSD).allcvs.c; \
+		echo " */" >> $(PSD).allcvs.c;                                \
+		echo "#include \"sys/types.h\"" >> $(PSD).allcvs.c;           \
+		echo "#include \"epic_geometry_types.h\"" >> $(PSD).allcvs.c; \
+	fi 
+	if [ $(ESEMAJOR) -ge 27 ];  then                \
+		echo "#define HOST" >> $(PSD).allcvs.c; \
+ 		echo "#include \"GEtypes.h\"" >> $(PSD).allcvs.c;       \
+ 		echo "#include \"prescan_defs.h\"" >> $(PSD).allcvs.c;       \
+		echo "#define HOST" >> mydefines.h; \
+	fi 
+	if [ $(ESEMAJOR) -ge 23 ];  then                                \
+ 		echo "#include \"$(PSD).global.h\"" >> $(PSD).allcvs.c;       \
+		echo "#include \"$(PSD).allcv.h\"" >> $(PSD).allcvs.c;        \
+		echo "#include \"$(PSD).tgtex.h\"" >> $(PSD).allcvs.c;        \
+		echo "#include \"op_global.h\"" >> $(PSD).allcvs.c;           \
+	fi
+	if [ $(ESEMAJOR) -ge 26 ];  then                                      \
+		if [ -h prescan_defs.h ]; then                                     \
+			rm prescan_defs.h;                                         \
+		fi;                                                           \
+    ln -s /ESE_$(ESEVER)/psd/include/private/prescan_defs.h . ;      \
+	fi
+	if [ $(ESEMAJOR) -ge 26 ];  then                                      \
+		if [ -h op_global.h ]; then                                     \
+			rm op_global.h;                                         \
+		fi;                                                           \
+		ln -s /ESE_$(ESEVER)/lx/include/op_global.h . ;                  \
+		if [ -h op_recn.h ]; then                                     \
+			rm op_recn.h;                                         \
+		fi;                                                           \
+		ln -s /ESE_$(ESEVER)/lx/include/op_recn.h . ;                  \
+		if [ -h GEtimespec.h ]; then                                     \
+			rm GEtimespec.h;                                         \
+		fi;                                                           \
+		ln -s /ESE_$(ESEVER)/lx/include/GEtimespec.h . ;                  \
+		if [ -h DbKey.h ]; then                                     \
+			rm DbKey.h;                                         \
+		fi;                                                           \
+		ln -s /ESE_$(ESEVER)/lx/include/DbKey.h . ;                  \
+		if [ -h epic_pulse_structs.h ]; then \
+			rm epic_pulse_structs.h; \
+		fi; \
+		ln -s /ESE_${ESEVER}/psd/include/private/epic_pulse_structs.h .; \
+		echo "#include \"GEtimespec.h\"" >> $(PSD).allcvs.c;             \
+		echo "#include \"op_recn.h\"" >> $(PSD).allcvs.c;             \
+		echo "#include \"epic_pulse_structs.h\"" >> $(PSD).allcvs.c;             \
+	fi
+	echo "RF_PULSE rfpulse[MAX_RFPULSE];" >> $(PSD).allcvs.c;     \
+ 	echo "GRAD_PULSE gradx[MAX_GRADX];" >> $(PSD).allcvs.c;       \
+ 	echo "GRAD_PULSE grady[MAX_GRADY];" >> $(PSD).allcvs.c;       \
+  echo "GRAD_PULSE gradz[MAX_GRADZ];" >> $(PSD).allcvs.c;       \
+	if [[ $(ESEMAJOR) -eq 27 && $(ESEMINOR) -ge 3 ]];  then			\
+		$(GENCVSH) --psd_name_is_func;                            \
+	else 																													\
+		$(GENCVSH);																									\
+	fi;
+		  
+
+
+#		echo "#include \"epic.global.h\"" >> $(PSD).allcvs.c; \
+		echo "#ifndef _SYS_TYPES_H" >> $(PSD).allcvs.c; \
+		echo "#define _SYS_TYPES_H    1" >> $(PSD).allcvs.c; \
+		echo "typedef unsigned char u_int8_t;      " >> $(PSD).allcvs.c; \
+		echo "typedef unsigned short int u_int16_t;" >> $(PSD).allcvs.c; \
+		echo "typedef unsigned int u_int32_t;      ">> $(PSD).allcvs.c; \
+		echo "typedef unsigned long long int u_int64_t;" >> $(PSD).allcvs.c; \
+		echo "#endif" >> $(PSD).allcvs.c; \
+
+$(PSD)_cv_reader.c: $(PSD)_cv.h
+	$(GENCVSH) --reader 
+
+print_$(PSD)_cv: $(PSD)_cv_reader.c
+	gcc -g -gstabs $(EPIC_INCLUDES) -c $(PSD)_cv_reader.c \
+		-o $(PSD)_cv_reader.o
+	gcc -g -gstabs $(EPIC_INCLUDES) -c $(PSD)_cv_printer.c \
+		-o $(PSD)_cv_printer.o
+	gcc -g -gstabs $(EPIC_INCLUDES) -c check_$(PSD)_cv.c \
+		-o check_$(PSD)_cv.o
+	gcc -g -gstabs $(EPIC_INCLUDES) $(PSD)_cv_reader.o $(PSD)_cv_printer.o \
+		check_$(PSD)_cv.o print_$(PSD)_cv.c -o print_$(PSD)_cv
+
+reader: print_$(PSD)_cv 
+
+readerclean:
+	touch $(STUFF_TO_CLEAN)
+	rm $(STUFF_TO_CLEAN)
+

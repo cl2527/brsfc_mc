@@ -1,0 +1,32 @@
+int opentry
+int oppos
+int opplane
+int opimode
+int oppseq
+char psd_name 255
+int oppure
+int opscic
+float opuser0
+float opuser1
+float opuser5
+float opuser7
+float opuser8
+float opuser9
+float opuser10
+float opuser19
+float opflip
+int opnecho
+float opfov
+int opslquant
+float opslthick
+SCAN_INFO scan_info 1
+float piscancenter
+int opxres
+int opyres
+int opspf
+float oprbw
+int opspecir
+int oplava
+int lava_flag
+int optr
+

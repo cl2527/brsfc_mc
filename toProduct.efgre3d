@@ -1,0 +1,19 @@
+#
+# Template.toProduct 1.1       9/17/92 13:56:08
+# Copyright (c) 1990 The General Electric Company
+#
+# Filename       Mode Dest_Dir     Tape  Integ  Group  Owner  Link            Resp  Com
+# --------       ---- --------     ----  -----  -----  -----  ----            ----  ---
+efgre3d           555 /usr/g/bin   Tape  Int    Group  Owner  Link            Resp  # host code
+efgre3d.psd.o     555 /usr/gvx/bin Tape  Int    Group  Owner  Link            Resp  # target code
+ec-tricks-kernel  555 /usr/g/bin   Tape  Int    Group  Owner  Link            Resp  #host psdfile
+EFGRE3D           555 /usr/g/bin   Tape  Int    Group  Owner  efgre3d         Resp  #host psdfile
+EFGRE3D.psd.o     555 /usr/gvx/bin Tape  Int    Group  Owner  efgre3d.psd.o   Resp  #target psdfile #mod for MRIge56989
+vibrant-xv        555 /usr/g/bin   Tape  Int    Group  Owner  efgre3d         Resp  # host code MRIhc14938
+vibrant-xv.psd.o  555 /usr/gvx/bin Tape  Int    Group  Owner  efgre3d.psd.o   Resp  # target code
+VIBRANT-XV        555 /usr/g/bin   Tape  Int    Group  Owner  efgre3d         Resp  # host code
+VIBRANT-XV.psd.o  555 /usr/gvx/bin Tape  Int    Group  Owner  efgre3d.psd.o   Resp  # target code
+Inh-3DIFIR        555 /usr/g/bin   Tape  Int    Group  Owner  efgre3d         Resp  # host code
+Inh-3DIFIR.psd.o  555 /usr/gvx/bin Tape  Int    Group  Owner  efgre3d.psd.o   Resp  # target code
+INH-3DIFIR        555 /usr/g/bin   Tape  Int    Group  Owner  efgre3d         Resp  # host code
+INH-3DIFIR.psd.o  555 /usr/gvx/bin Tape  Int    Group  Owner  efgre3d.psd.o   Resp  # target code

@@ -1,0 +1,28 @@
+This version of the pulse sequence splits moves the version specific 
+files to subdirectories 14M5, 15M3, etc.
+
+To build a version specific pulse sequence (say 14), do the following 
+>  cd 14M5
+>  ../prep_psd_files
+>  prep_psd_dir
+>  ese214M5
+>  psdqmake clean sim hw
+
+The Imakefile now defines ESEDIR, ESEMAJOR and ESEMINOR #defines. For 14M5
+their values are 14M5 , 14 and 5, respectively
+
+For instance, if you want to run code only on 16, you can type
+
+#if ESEMAJOR == 16
+  do_something();
+#endif
+
+If you want to run code for 15 or higher, you can type
+
+#if ESEMAJOR >= 15
+  do_something_else();
+#endif
+
+If you want to modify the common files while testing for a specific scanner, 
+you can use these defines to reduce the impact on the other versions until 
+the changes have been tested on all platforms.

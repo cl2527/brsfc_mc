@@ -1,0 +1,66 @@
+#!/bin/bash
+
+SOURCE=`readlink $0`
+if [ "x$SOURCE" == "x" ]
+then 
+        SOURCE=$0
+fi
+BASENAME=`basename $SOURCE`
+DIRNAME=`dirname $SOURCE`
+export ESEVERSH=${DIRNAME}/esever.sh
+
+manage_link()
+{
+  ESEMAJOR=$(${ESEVERSH} --major)
+  source=../${2}
+  target=${2}
+  if [ "${ESEMAJOR}" -ge 27 ]
+  then
+    if ! [ "${3}" == "" ]
+    then
+      target=${3}
+    fi
+  fi
+  if [ -h ${target} ]
+  then
+    rm -v ${target}
+  fi
+  if ! [ "x${1}" == "xdel" ]
+  then
+    ln -sv ${source} ${target}
+  fi
+}
+
+export -f manage_link
+
+if ! [ -f ../psd_file_list ]
+then
+  echo Please run this in one of the ESE subdirectories
+exit 1
+else
+  filelist=../psd_file_list
+fi
+
+
+if [ "x$1" == "xdel" ]
+then
+	cmd=${1}
+else
+	cmd="create"
+fi
+
+awk -v cmd=${cmd} '{print "manage_link " cmd " " $1 " " $2}' $filelist | xargs -i sh -c "{}"   
+  
+#for i in `cat ../psd_file_list`
+#do
+#  if [ -h $i ]
+#  then
+#    echo rm $i
+#    rm $i
+#  fi
+#  if ! [ "x$1" == "xdel" ]
+#  then
+#    echo ln -s ../$i .
+#    ln -s ../$i .
+#  fi
+#done

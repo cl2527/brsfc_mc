@@ -1,0 +1,312 @@
+/*
+ * Imakefile
+ *
+ * Imakefile template for an EPIC PSD.
+ *
+ * This file creates the Makefile for this PSD on an imboot 
+ * and provides the necessary support to generate the (host and tgt) 
+ * hardware and simulation executables for an EPIC PSD.
+ * 
+ * Support for building the PSD Eval executable and building two PSDs from 
+ * the same source file are discontinued.
+ * 
+ * Author:  Roshy J. Francis, Daniel L. Premetz
+ * Date  : 20/May/2002
+ * 
+ */
+
+/*
+ * define ESEMAJOR, ESEMINOR, ESEDEFINES, ... 
+ */
+include ../Makefile.ese
+
+ifeq ($(CALLNOWARNINGS),TRUE)
+WERROR=
+else
+WERROR = $(shell  \
+  if [ $(ESEMAJOR) -ge 16 ]; then echo " -Werror"; fi;)
+endif
+
+ENDIAN_CONVERTER_FLAGS += -DNO_PTHREAD_H
+
+LIBCONFIGDIR=../../../../util/libconfig
+LIBCONFIGFLAG=-I$(LIBCONFIGDIR)/lib
+LIBCONFIGLIB=$(LIBCONFIGDIR)_32/lib/.libs/libconfig.a
+
+
+
+$(warning Compiling with flags $(ESEDEFINES) for toolset $(TOOLSET))
+
+ifneq ($(TOOLSET),EPIC)
+  GENCV=FALSE
+else
+  GENCV=$(GENCVFLAG)
+endif
+
+ifeq ($(TOOLSET),SIM_LINUX)
+  	CXX_333 = $(shell \
+	ls /usr/local/share/gcc-3.3.3/bin/g++ 2>/dev/null;)
+	ifneq ($(CXX_333), )
+		CXX=$(CXX_333)
+	endif
+	ADD_LINKFLAGS_HS_EXTRA = -L/usr/lib -L/lib
+	EXTRA_LIBS = $(shell  \
+	if [ $(ESEMAJOR) -le 27 ]; \
+  	then \
+		echo "/lib/libpthread.so.0 /usr/lib/libz.so";\
+	else \
+		echo "/usr/lib/libpthread.so /usr/lib/libz.so";\
+	fi;)
+	EXTRA_INCLUDE = $(shell  \
+	if [ $(ESEMAJOR) -le 27 ]; \
+  	then \
+		echo "-I/usr/include";\
+	fi;)
+ #$(warning CXX = $(CXX))	
+else
+	EXTRA_LIBS = $(shell  \
+	if [ $(ESEMAJOR) -le 27 ]; \
+  	then \
+		echo "/lib/libpthread.so.0 /usr/lib/libz.so";\
+	elif [ $(ESEMAJOR) -le 15 ]; \
+  	then \
+		echo "../os/lib/libpthread.so.0 ../os/lib/libz.so";\
+	else \
+		echo "/usr/lib/libpthread.so /usr/lib/libz.so";\
+	fi;)
+	EXTRA_INCLUDE = $(shell  \
+	if [ $(ESEMAJOR) -le 15 ]; \
+  then \
+		echo "-I../os/include";\
+	else \
+		echo "-I/usr/include";\
+	fi;)
+endif
+
+ifeq ($(TOOLSET),PSD_TGT_ICE)
+	CFLAGS_TH_EXTRA = -DSTDIOLIBMISSING	
+endif
+
+/*
+ * The toolset to be used in the make. For a PSD, this is always specified as 
+ * EPIC, regardless of whether this is built with EPIC or EPIC+.
+ */
+TOOLSET = EPIC
+
+/* 
+ * The make phase where this directory is getting built in product builds;
+ * one of includes, libraries or programs.  Since the PSDs are built in the 
+ * final build phase(programs), this parameters must be set to programs for 
+ * a PSD directory. 
+ */
+MAKE_TARGET = programs
+
+
+/*
+ *
+ * The root name of the PSD to be built; eg: 2dfast, fsemaster
+ */
+PSD = brsfc
+
+
+/*
+ * Local inline files used in this PSD are to be specified here.
+ * These .e files are not compiled separately, but will trigger a recompilation
+ * of the PSD when changed if specified here.
+ */
+ADD_INLINE_FILES =
+
+/*
+ * Additional (local) .e modules to be compiled using the EPIC+ compiler; 
+ * only applicable to EPIC+ PSDs.
+ */
+ADD_EFILES =
+
+/*
+ * Local C files to be compiled with the standard and additional host flags
+ * and linked to generate the host hardware (<psdname>) and simulation 
+ * (<psdname>.host) executables. 
+ */
+ADD_CFILES_HOST = spielman.c spielman_dual.c vds.c vds_inv.c angletest.c \
+	psc.c  
+
+ifeq ($(GENCVFLAG),TRUE)
+  ADD_CFILES_HOST += $(PSD)_cv_printer.c $(PSD)_cv_zprinter.c \
+	  $(PSD)_cv_gzwriter.c fprint_psc_protocol.c
+endif
+
+ADD_CFILES_HOST += $(shell  \
+	if [ $(ESEMAJOR) -ge 15 ]; then echo " efgre3d_support.c "; fi;)
+
+ADD_CFILES_HOST += $(shell  \
+	if [ $(ESEMAJOR) -ge 25 ]; then echo " 3dgre_support.c disco_support.c "; fi;)
+
+/*
+ * Local C files to be compiled with the standard and additional tgt flags
+ * and linked to generate the tgt hardware (<psdname>.psd.o) and simulation 
+ * (<psdname>.tgt) executables. 
+ */
+ADD_CFILES_TGT = angletest.c vx_rcmd.c psc.c
+ADD_CFILES_TGT += $(shell  \
+	if [ $(ESEMAJOR) -ge 15 ]; then echo " efgre3d_support.c "; fi;)
+ADD_CFILES_TGT += $(shell  \
+	if [ $(ESEMAJOR) -ge 25 ]; then echo " 3dgre_support.c "; fi;)
+ADD_CFILES_TGT += $(shell  \
+	if [ $(ESEMAJOR) -ge 26 ]; then echo " FastCINE3D_support.c "; fi;)
+
+
+/*
+ * Flags to be passed to the EPIC compiler in addition to the standard 
+ * flags.  The standard flags cannot be overridden.
+ */
+ADD_EFLAGS = -z
+ADD_EFLAGS += $(shell  \
+	if [ $(ESEMAJOR) -ge 26 ]; then echo " -+"; fi;)
+
+/*
+ * Additional directories to be specified in the include path for the EPIC
+ * compiler.  These will be carried over to be included in the c compilation line
+ * for the c files generated from the .e file.
+ */
+ADD_E_INCLUDES =  $(ESEDEFINES)
+
+/*
+ * Additional compiler flags to be passed to the C compiler when compiling a 
+ * C source to be included in the host hardware executable.
+ * eg: -DMY_FLAG to define MYFLAG conditional compilation directive.
+ * Note that hardware and simulation compilation flags are specified independently.
+ * See ADD_CFLAGS_HS definition for the host sim counterpart.
+ */
+ADD_CFLAGS_HH = -DBRS=1 $(ESEDEFINES) -D_HH_ $(LIBCONFIGFLAG) $(EXTRA_INCLUDE)
+ADD_CFLAGS_HH += $(WERROR)
+
+/*
+ * Additional compiler flags to be passed to the C compiler when compiling a 
+ * C source to be included in the host simulation executable.
+ * eg: -DMY_FLAG to define MYFLAG conditional compilation directive.
+ * Note that hardware and simulation compilation flags are specified independently.
+ * See ADD_CFLAGS_HH definition for the host hw counterpart.
+ */
+ADD_CFLAGS_HS = -DBRS=1 $(ESEDEFINES) -D_HS_ $(LIBCONFIGFLAG) $(EXTRA_INCLUDE)
+ADD_CFLAGS_HS += $(WERROR)
+
+/*
+ * Additional compiler flags to be passed to the C cross-compiler when compiling a 
+ * C source to be included in the tgt hardware executable. (<psdname>.psd.o)
+ * eg: -DMY_FLAG to define MYFLAG conditional compilation directive.
+ * Note that hardware and simulation compilation flags are specified independently.
+ * See ADD_CFLAGS_TS definition for the tgt sim counterpart.
+ */
+ADD_CFLAGS_TH = -DBRS=1 $(ESEDEFINES) -D_TH_ ${CFLAGS_TH_EXTRA}
+ADD_CFLAGS_TH += $(WERROR)
+
+/*
+ * Additional compiler flags to be passed to the C compiler when compiling a 
+ * C source to be included in the tgt simulation executable. (<psdname>.tgt)
+ * eg: -DMY_FLAG to define MYFLAG conditional compilation directive.
+ * Note that hardware and simulation compilation flags are specified independently.
+ * See ADD_CFLAGS_TH definition for the tgt hardware counterpart.
+ */
+ADD_CFLAGS_TS = -DBRS=1 $(ESEDEFINES) -D_TS_ $(EXTRA_INCLUDE) 
+ADD_CFLAGS_TS += $(WERROR)
+
+/*
+ * Additional flags to be passed to the linker when creating the host hw PSD.
+ * Note that hardware and simulation compilation flags are specified independently.
+ * See ADD_LINKFLAGS_HS definition for the host sim counterpart.
+ */
+ADD_LINKFLAGS_HH =
+
+/*
+ * Additional flags to be passed to the linker when creating the host sim PSD.
+ * Note that hardware and simulation compilation flags are specified independently.
+ * See ADD_LINKFLAGS_HOST_HW definition for the host hw counterpart.
+ */
+ADD_LINKFLAGS_HS = $(ADD_LINKFLAGS_HS_EXTRA) 
+
+/*
+ * Additional flags to be passed to the linker when creating the tgt hw PSD object.
+ * Note that hardware and simulation compilation flags are specified independently.
+ * See ADD_LINKFLAGS_TGT_SIM definition for the tgt sim counterpart.
+ */
+ADD_LINKFLAGS_TH =
+
+/*
+ * Additional flags to be passed to the linker when creating the tgt sim PSD 
+ * executable. (<psdname>.tgt)
+ * Note that hardware and simulation compilation flags are specified independently.
+ * See ADD_LINKFLAGS_TGT_HW definition for the tgt hw counterpart.
+ */
+ADD_LINKFLAGS_TS =
+
+/*
+ * Additional local libraries to be passed to the linker when creating the host hw PSD.
+ */
+ADD_LIBS_HH = $(EXTRA_LIBS) $(LIBCONFIGLIB)
+
+/*
+ * Additional local libraries to be passed to the linker when creating the host sim PSD.
+ */
+ADD_LIBS_HS = $(EXTRA_LIBS) $(LIBCONFIGLIB)
+
+
+/*
+ * Additional local libraries to be passed to the linker when creating the tgt hw PSD.
+ */
+ADD_LIBS_TH =
+
+/*
+ * Additional local libraries to be passed to the linker when creating the tgt sim PSD.
+ */
+ADD_LIBS_TS =
+
+/*********************************************Pascal 05/09/09 */
+test::
+	make -f Makefile.test
+
+testclean::
+	make -f Makefile.test clean
+/**************************************************************/
+
+/*
+ * This PSD is using Pulsegen on host. This rule pulls in
+ * the necessary compile/link flags and libraries to support
+ * this epic platform feature.
+ */
+UsePgenOnHost()
+
+/*
+ * This PSD is using slew-rate optimization using actual dB/dt.
+ * This rule pulls in the libraries required to support this feature.
+ * Note that UsePgenOnHost() rule is a pre-requisite for this rule
+ */
+UseDbDtLibrary()
+
+
+/* 
+ * Specify compilation Modes: PsdParameters rule define standard parameter 
+ * definitions used during a PSD build. These parameters cannot be changed
+ * via Imakefile, but can be extended with more flags 
+ */
+PsdParameters()
+
+/*
+ * Specify compilation Modes: NoWarnings() rule treats compiler warnings
+ * as errors.
+ */
+ifeq ($(CALLNOWARNINGS),TRUE)
+NoWarnings()
+endif
+
+/* 
+ * Specify compilation Modes: BuildingEpicPsd() rule establishes the 
+ * standard EPIC PSD build dependencies and compilation mechanisms.
+ */
+BuildingEpicPsd()
+
+ifeq ($(GENCV),TRUE)
+include Makefile.gencv
+include Makefile.genpsc
+endif
+
+/* End Imakefile */

@@ -1,0 +1,5 @@
+GENPSCSH=./gen_psc_files.sh
+
+hw sim $(MAKE_TARGET):: 
+	$(GENPSCSH)
+
